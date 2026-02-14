@@ -1,10 +1,19 @@
 import axios from 'axios';
 
 // API Base URL - can be configured via environment variable
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://passo-backend.onrender.com/api';
 
 // Create axios instance with default config
 const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 10000, // 10 seconds
+});
+
+// Create public axios instance (no auth required)
+const publicApi = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
@@ -26,7 +35,7 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor - Handle errors globally
+// Response interceptor for authenticated API
 api.interceptors.response.use(
   (response) => {
     // Return the full response data (which contains success, data, etc.)
@@ -41,7 +50,7 @@ api.interceptors.response.use(
       if (error.response.status === 401) {
         localStorage.removeItem('adminToken');
         localStorage.removeItem('adminUser');
-        window.location.href = '/login';
+        window.location.href = '/admin/login';
       }
       
       return Promise.reject({ message, status: error.response.status, data: error.response.data });
@@ -50,6 +59,23 @@ api.interceptors.response.use(
       return Promise.reject({ message: 'Network error. Please check your connection.', status: 0 });
     } else {
       // Something else happened
+      return Promise.reject({ message: error.message || 'An unexpected error occurred', status: 0 });
+    }
+  }
+);
+
+// Response interceptor for public API
+publicApi.interceptors.response.use(
+  (response) => {
+    return response.data;
+  },
+  (error) => {
+    if (error.response) {
+      const message = error.response.data?.message || 'An error occurred';
+      return Promise.reject({ message, status: error.response.status, data: error.response.data });
+    } else if (error.request) {
+      return Promise.reject({ message: 'Network error. Please check your connection.', status: 0 });
+    } else {
       return Promise.reject({ message: error.message || 'An unexpected error occurred', status: 0 });
     }
   }
@@ -77,6 +103,7 @@ export const userAPI = {
 // Worker API endpoints
 export const workerAPI = {
   getAll: (params) => api.get('/workers', { params }),
+  getPublic: (params) => publicApi.get('/workers/public', { params }), // Public endpoint
   getById: (id) => api.get(`/workers/${id}`),
   create: (workerData) => api.post('/workers', workerData),
   update: (id, workerData) => api.put(`/workers/${id}`, workerData),
@@ -92,11 +119,11 @@ export const workerAPI = {
 
 // Category API endpoints
 export const categoryAPI = {
-  getAll: () => api.get('/categories'),
-  getById: (id) => api.get(`/categories/${id}`),
-  create: (categoryData) => api.post('/categories', categoryData),
-  update: (id, categoryData) => api.put(`/categories/${id}`, categoryData),
-  delete: (id) => api.delete(`/categories/${id}`),
+  getAll: () => publicApi.get('/categories'), // Public - no auth required
+  getById: (id) => publicApi.get(`/categories/${id}`), // Public - no auth required
+  create: (categoryData) => api.post('/categories', categoryData), // Protected
+  update: (id, categoryData) => api.put(`/categories/${id}`, categoryData), // Protected
+  delete: (id) => api.delete(`/categories/${id}`), // Protected
 };
 
 // Dashboard API endpoints

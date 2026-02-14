@@ -1,5 +1,42 @@
 @import "tailwindcss";
 
+/* Mobile-First Responsive Improvements */
+@media (max-width: 640px) {
+  /* Prevent horizontal scroll on mobile */
+  body {
+    overflow-x: hidden;
+  }
+  
+  /* Ensure header stays visible and properly sized */
+  header {
+    min-height: 60px;
+  }
+  
+  /* Better touch targets for mobile */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Prevent text from being too small */
+  html {
+    font-size: 16px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 375px) {
+  /* Even smaller adjustments for very small phones */
+  header {
+    min-height: 56px;
+  }
+  
+  button, a {
+    min-height: 40px;
+    min-width: 40px;
+  }
+}
+
 /* Optimize container widths for better space usage */
 .container {
   max-width: 100% !important;

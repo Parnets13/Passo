@@ -1,6 +1,16 @@
 import { MdMenu, MdNotifications, MdAccountCircle, MdLogout } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Header = ({ toggleSidebar }) => {
+  const navigate = useNavigate();
+  const { logout, user } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/admin/login');
+  };
+
   return (
     <header className="bg-white shadow-sm border-b px-4 py-2.5">
       <div className="flex items-center justify-between">
@@ -12,7 +22,7 @@ const Header = ({ toggleSidebar }) => {
             <MdMenu size={22} className="text-gray-600" />
           </button>
           <div>
-            <h2 className="text-base font-semibold text-gray-800">Welcome, Admin</h2>
+            <h2 className="text-base font-semibold text-gray-800">Welcome, {user?.name || 'Admin'}</h2>
             <p className="text-[10px] text-gray-500">Manage your platform efficiently</p>
           </div>
         </div>
@@ -24,9 +34,13 @@ const Header = ({ toggleSidebar }) => {
           </button>
           <div className="flex items-center gap-1.5 px-2 py-1.5 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors">
             <MdAccountCircle size={24} className="text-gray-600" />
-            <span className="text-xs font-medium text-gray-700">Admin</span>
+            <span className="text-xs font-medium text-gray-700">{user?.name || 'Admin'}</span>
           </div>
-          <button className="p-1.5 hover:bg-red-50 rounded-lg transition-colors">
+          <button 
+            onClick={handleLogout}
+            className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+            title="Logout"
+          >
             <MdLogout size={20} className="text-red-500" />
           </button>
         </div>

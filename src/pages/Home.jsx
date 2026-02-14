@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   MdWork, MdLocationOn, MdSearch, MdStar, MdClose,
@@ -29,6 +29,7 @@ import { GiCookingPot, GiWaterDrop, GiGasStove, GiMilkCarton } from 'react-icons
 import WorkerLogin from './WorkerLogin';
 import { getTranslation } from '../utils/translations';
 import { categoryAPI } from '../services/api';
+import SEO from '../components/SEO';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ const Home = () => {
   const [showComingSoonModal, setShowComingSoonModal] = useState(false);
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
+  const isLoadingRef = useRef(false); // Prevent duplicate API calls
 
   const allLanguages = [
     { code: 'en', name: 'English', nativeName: 'English' },
@@ -259,7 +261,7 @@ const Home = () => {
   });
 
   useEffect(() => {
-    // Load categories from backend
+    // Load categories from backend only once
     loadCategories();
 
     // Check if language is already saved in localStorage
@@ -291,22 +293,56 @@ const Home = () => {
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, []); // Empty dependency array - run only once on mount
 
-  const loadCategories = async () => {
+  const loadCategories = async (retryCount = 0) => {
+    // Prevent duplicate calls
+    if (isLoadingRef.current) {
+      console.log('⏭️ Skipping duplicate API call');
+      return;
+    }
+
     try {
+      isLoadingRef.current = true;
       setLoadingCategories(true);
       const response = await categoryAPI.getAll();
-      if (response && response.success) {
+      console.log('📦 Raw API response:', response);
+      
+      if (response && response.success && Array.isArray(response.data)) {
         // Only show active categories
         const activeCategories = response.data.filter(cat => cat.active);
         setCategories(activeCategories);
-        console.log('✅ Loaded categories:', activeCategories);
+        setLoadingCategories(false);
+        isLoadingRef.current = false;
+        console.log('✅ Loaded categories:', activeCategories.length, 'active categories');
+      } else {
+        console.warn('⚠️ Unexpected response format:', response);
+        setCategories([]);
+        setLoadingCategories(false);
+        isLoadingRef.current = false;
       }
     } catch (error) {
       console.error('❌ Error loading categories:', error);
-    } finally {
-      setLoadingCategories(false);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.status,
+        data: error.data
+      });
+      
+      // Retry logic - try up to 2 times with 2 second delay
+      if (retryCount < 2) {
+        console.log(`🔄 Retrying... (attempt ${retryCount + 1}/2)`);
+        isLoadingRef.current = false; // Allow retry
+        setTimeout(() => {
+          loadCategories(retryCount + 1);
+        }, 2000);
+      } else {
+        // After all retries failed, set empty array and stop loading
+        console.error('❌ All retry attempts failed');
+        setCategories([]);
+        setLoadingCategories(false);
+        isLoadingRef.current = false;
+      }
     }
   };
 
@@ -358,6 +394,13 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* SEO Component */}
+      <SEO 
+        title={`Passo - Find Local Service Experts in ${selectedLocation} | Home Services Platform`}
+        description={`Connect with verified professionals for plumbing, electrical, cleaning, AC repair, carpentry, and more in ${selectedLocation}. Book trusted local workers with 4.8★ rating. 50,000+ jobs completed.`}
+        keywords={`local services ${selectedLocation}, home services ${selectedLocation}, plumber ${selectedLocation}, electrician ${selectedLocation}, carpenter ${selectedLocation}, cleaning services ${selectedLocation}, AC repair ${selectedLocation}, pest control ${selectedLocation}, verified workers, service booking, home maintenance`}
+        canonical="https://passo.com/"
+      />
       
       {/* Worker Login Modal */}
       {showWorkerLogin && (
@@ -470,39 +513,43 @@ const Home = () => {
         </div>
       )}
 
-      {/* Premium Header */}
+      {/* Premium Header - Mobile Responsive */}
       <header className="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-40 border-b border-gray-100">
-        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16">
-          <div className="flex items-center justify-between py-2 sm:py-3 gap-2">
+        <div className="w-full px-3 sm:px-6 lg:px-12 xl:px-16">
+          <div className="flex items-center justify-between py-2 sm:py-3 gap-1 sm:gap-2">
             {/* Logo Section */}
-            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            <div className="flex items-center gap-2 flex-shrink-0">
               <img 
-                src="/src/assets/logo.jpeg" 
+                src="/logo.jpeg" 
                 alt="Passo" 
-                className="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-xl"
-                onError={(e) => e.target.style.display = 'none'}
+                className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain rounded-lg"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%2326296c" width="100" height="100"/%3E%3Ctext x="50" y="50" font-size="40" fill="white" text-anchor="middle" dominant-baseline="middle"%3EP%3C/text%3E%3C/svg%3E';
+                }}
               />
-              {/* <div className="flex flex-col">
-                <span className="text-2xl sm:text-3xl font-bold text-[#26296c]">
+              <div className="flex flex-col">
+                <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#26296c]">
                   Passo
                 </span>
-                <span className="text-[10px] sm:text-xs text-gray-600 font-medium -mt-1">
+                <span className="text-[9px] sm:text-[10px] md:text-xs text-gray-600 font-medium -mt-0.5 sm:-mt-1 hidden xs:block">
                   Your Service Partner
                 </span>
-              </div> */}
+              </div>
             </div>
 
             {/* Right Section - Buttons */}
-            <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
               {/* Language Selector */}
               <button
                 onClick={() => setShowLanguageModal(true)}
-                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-gray-700 hover:text-[#26296c] transition-all text-xs sm:text-sm font-medium rounded-xl hover:bg-gray-50 border border-gray-200"
+                className="flex items-center justify-center gap-1 px-1.5 sm:px-2 md:px-3 py-1.5 sm:py-2 text-gray-700 hover:text-[#26296c] transition-all text-xs sm:text-sm font-medium rounded-lg hover:bg-gray-50 border border-gray-200 min-w-[32px] sm:min-w-[40px]"
+                title="Select Language"
               >
-                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
                 </svg>
-                <span className="hidden sm:inline truncate max-w-[80px]">
+                <span className="hidden md:inline truncate max-w-[60px] lg:max-w-[80px]">
                   {allLanguages.find(lang => lang.name === selectedLanguage)?.nativeName || 'English'}
                 </span>
               </button>
@@ -510,16 +557,17 @@ const Home = () => {
               {/* Location Button */}
               <button
                 onClick={() => setShowLocationModal(true)}
-                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 text-gray-700 hover:text-[#26296c] transition-all text-xs sm:text-sm font-medium rounded-xl hover:bg-gray-50"
+                className="flex items-center justify-center gap-1 px-1.5 sm:px-2 md:px-3 py-1.5 sm:py-2 text-gray-700 hover:text-[#26296c] transition-all text-xs sm:text-sm font-medium rounded-lg hover:bg-gray-50 min-w-[32px] sm:min-w-[40px]"
+                title={selectedLocation}
               >
-                <MdLocationOn size={18} className="text-[#26296c] flex-shrink-0" />
-                <span className="hidden sm:inline truncate max-w-[100px]">{selectedLocation}</span>
+                <MdLocationOn size={16} className="text-[#26296c] flex-shrink-0 sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden md:inline truncate max-w-[60px] lg:max-w-[100px]">{selectedLocation}</span>
               </button>
 
               {/* Login Button */}
               <button
                 onClick={() => setShowWorkerLogin(true)}
-                className="px-3 sm:px-6 py-2 sm:py-2.5 rounded-xl font-semibold transition-all text-[#26296c] border-2 border-[#26296c] hover:bg-[#26296c] hover:text-white text-xs sm:text-base"
+                className="px-2 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 rounded-lg font-semibold transition-all text-[#26296c] border-2 border-[#26296c] hover:bg-[#26296c] hover:text-white text-[10px] sm:text-xs md:text-sm whitespace-nowrap"
               >
                 {t.login}
               </button>
@@ -527,7 +575,7 @@ const Home = () => {
               {/* Register Button */}
               <button
                 onClick={() => navigate('/worker-registration')}
-                className="px-3 sm:px-6 py-2 sm:py-2.5 rounded-xl font-semibold transition-all text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 bg-[#26296c] hover:bg-[#1e2154] text-xs sm:text-base"
+                className="px-2 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 rounded-lg font-semibold transition-all text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 bg-[#26296c] hover:bg-[#1e2154] text-[10px] sm:text-xs md:text-sm whitespace-nowrap"
               >
                 {t.register}
               </button>
@@ -733,7 +781,13 @@ const Home = () => {
           ) : displayCategories.length === 0 ? (
             <div className="text-center py-12">
               <MdWork size={48} className="mx-auto mb-4 text-gray-300" />
-              <p className="text-gray-500">No services available at the moment</p>
+              <p className="text-gray-500 mb-4">No services available at the moment</p>
+              <button
+                onClick={() => loadCategories(0)}
+                className="px-6 py-2 bg-[#26296c] text-white rounded-lg hover:bg-[#1e2154] transition-all"
+              >
+                Retry Loading Services
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">

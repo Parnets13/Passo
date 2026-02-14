@@ -36,7 +36,9 @@ const ServiceDetail = () => {
       console.log('🔍 Loading workers for service:', displayName);
       console.log('📍 Query params:', { category: displayName, status: 'Approved' });
       
-      const url = `http://localhost:5000/api/workers/public?category=${encodeURIComponent(displayName)}&status=Approved`;
+      // Use environment variable for API URL
+      const API_URL = import.meta.env.VITE_API_URL || 'https://passo-backend.onrender.com/api';
+      const url = `${API_URL}/workers/public?category=${encodeURIComponent(displayName)}&status=Approved`;
       console.log('🌐 Fetching from:', url);
       
       // Fetch from backend API using PUBLIC endpoint (no auth required)
@@ -168,7 +170,7 @@ const ServiceDetail = () => {
   const submitReview = async () => {
     try {
       // Submit review to backend
-      const response = await fetch('http://localhost:5000/api/reviews', {
+      const response = await fetch('https://passo-backend.onrender.com/api/reviews', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

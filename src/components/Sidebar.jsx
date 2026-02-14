@@ -22,18 +22,18 @@ const Sidebar = ({ isOpen }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const menuItems = [
-    { path: '/', icon: MdDashboard, label: 'Dashboard', color: '#3B82F6' },
-    { path: '/users', icon: MdPeople, label: 'Users Management', color: '#10B981' },
-    { path: '/workers', icon: MdWork, label: 'Workers Management', color: '#F59E0B' },
-    { path: '/categories', icon: MdCategory, label: 'Categories', color: '#8B5CF6' },
-    { path: '/pricing', icon: MdAttachMoney, label: 'Pricing & Plans', color: '#EF4444' },
-    { path: '/featured', icon: MdStar, label: 'Featured & Ranking', color: '#F59E0B' },
-    { path: '/payments', icon: MdPayment, label: 'Payments & Revenue', color: '#10B981' },
-    { path: '/payment-management', icon: MdPayment, label: 'Payment Management', color: '#059669' },
-    { path: '/complaints', icon: MdReport, label: 'Complaints & Reports', color: '#EF4444' },
-    { path: '/analytics', icon: MdBarChart, label: 'Analytics', color: '#3B82F6' },
-    { path: '/notifications', icon: MdNotifications, label: 'Notifications', color: '#8B5CF6' },
-    { path: '/cms', icon: MdDescription, label: 'CMS / Legal', color: '#6B7280' },
+    { path: '/admin/dashboard', icon: MdDashboard, label: 'Dashboard', color: '#3B82F6' },
+    { path: '/admin/users', icon: MdPeople, label: 'Users Management', color: '#10B981' },
+    { path: '/admin/workers', icon: MdWork, label: 'Workers Management', color: '#F59E0B' },
+    { path: '/admin/categories', icon: MdCategory, label: 'Categories', color: '#8B5CF6' },
+    { path: '/admin/pricing', icon: MdAttachMoney, label: 'Pricing & Plans', color: '#EF4444' },
+    { path: '/admin/featured', icon: MdStar, label: 'Featured & Ranking', color: '#F59E0B' },
+    { path: '/admin/payments', icon: MdPayment, label: 'Payments & Revenue', color: '#10B981' },
+    { path: '/admin/payment-management', icon: MdPayment, label: 'Payment Management', color: '#059669' },
+    { path: '/admin/complaints', icon: MdReport, label: 'Complaints & Reports', color: '#EF4444' },
+    { path: '/admin/analytics', icon: MdBarChart, label: 'Analytics', color: '#3B82F6' },
+    { path: '/admin/notifications', icon: MdNotifications, label: 'Notifications', color: '#8B5CF6' },
+    { path: '/admin/cms', icon: MdDescription, label: 'CMS / Legal', color: '#6B7280' },
   ];
 
   const handleLogout = () => {
@@ -41,7 +41,7 @@ const Sidebar = ({ isOpen }) => {
       setIsLoggingOut(true);
       setTimeout(() => {
         logout();
-        navigate('/login');
+        navigate('/admin/login');
       }, 500);
     }
   };

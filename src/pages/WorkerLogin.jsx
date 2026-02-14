@@ -48,36 +48,39 @@ const WorkerLogin = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-md">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full relative overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-md">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-md w-full relative overflow-hidden max-h-[95vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
           aria-label="Close"
         >
           <MdClose size={24} />
         </button>
 
         {/* Header Section with Gradient */}
-        <div className="bg-gradient-to-r from-[#26296c] via-[#1e2154] to-[#26296c] px-8 py-10 text-center">
+        <div className="bg-gradient-to-r from-[#26296c] via-[#1e2154] to-[#26296c] px-6 sm:px-8 py-8 sm:py-10 text-center">
           <div className="flex justify-center mb-4">
             <div className="relative">
               <div className="absolute inset-0 bg-white rounded-2xl blur-md opacity-50"></div>
               <img 
-                src="/src/assets/logo.jpeg" 
+                src="/logo.jpeg" 
                 alt="Passo Logo" 
-                className="relative w-24 h-24 rounded-2xl shadow-2xl object-cover border-4 border-white"
-                onError={(e) => e.target.style.display = 'none'}
+                className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl shadow-2xl object-cover border-4 border-white"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%2326296c" width="100" height="100"/%3E%3Ctext x="50" y="50" font-size="40" fill="white" text-anchor="middle" dominant-baseline="middle"%3EP%3C/text%3E%3C/svg%3E';
+                }}
               />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Worker Login</h1>
-          <p className="text-blue-100">Sign in to access your account</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Worker Login</h1>
+          <p className="text-sm sm:text-base text-blue-100">Sign in to access your account</p>
         </div>
 
         {/* Form Section */}
-        <div className="px-8 py-8">
+        <div className="px-6 sm:px-8 py-6 sm:py-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Error Message */}
             {error && (

@@ -15,7 +15,7 @@ const Workers = () => {
 
   const loadWorkers = async () => {
     console.log('🔄 Loading workers from MongoDB...');
-    console.log('📍 API URL: http://localhost:5000/api/workers');
+    console.log('📍 API URL: https://passo-backend.onrender.com/api/workers');
     console.log('⏰ Timestamp:', new Date().toISOString());
     
     try {
@@ -33,7 +33,7 @@ const Workers = () => {
       
       // Add cache busting and force fresh data
       const cacheBuster = `?_t=${Date.now()}`;
-      const response = await fetch(`http://localhost:5000/api/workers${cacheBuster}`, {
+      const response = await fetch(`https://passo-backend.onrender.com/api/workers${cacheBuster}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -152,7 +152,7 @@ const Workers = () => {
       const token = localStorage.getItem('adminToken');
       console.log('🔄 Approving worker:', workerId);
       
-      const response = await fetch(`http://localhost:5000/api/workers/${workerId}/approve`, {
+      const response = await fetch(`https://passo-backend.onrender.com/api/workers/${workerId}/approve`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -195,7 +195,7 @@ const Workers = () => {
       const token = localStorage.getItem('adminToken');
       console.log('🔄 Rejecting worker:', worker.id);
       
-      const response = await fetch(`http://localhost:5000/api/workers/${worker.id}/reject`, {
+      const response = await fetch(`https://passo-backend.onrender.com/api/workers/${worker.id}/reject`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -233,7 +233,7 @@ const Workers = () => {
       const token = localStorage.getItem('adminToken');
       console.log('🔄 Blocking worker:', workerId);
       
-      const response = await fetch(`http://localhost:5000/api/workers/${workerId}/block`, {
+      const response = await fetch(`https://passo-backend.onrender.com/api/workers/${workerId}/block`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -270,7 +270,7 @@ const Workers = () => {
       const token = localStorage.getItem('adminToken');
       console.log('🔄 Deleting worker:', workerId);
       
-      const response = await fetch(`http://localhost:5000/api/workers/${workerId}`, {
+      const response = await fetch(`https://passo-backend.onrender.com/api/workers/${workerId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -305,8 +305,8 @@ const Workers = () => {
       const newFeatured = !worker.featured;
       
       const endpoint = newFeatured 
-        ? `http://localhost:5000/api/workers/${workerId}/featured`
-        : `http://localhost:5000/api/workers/${workerId}/featured`;
+        ? `https://passo-backend.onrender.com/api/workers/${workerId}/featured`
+        : `https://passo-backend.onrender.com/api/workers/${workerId}/featured`;
       
       const response = await fetch(endpoint, {
         method: newFeatured ? 'POST' : 'DELETE',

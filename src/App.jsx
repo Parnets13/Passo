@@ -24,12 +24,12 @@ import Analytics from './pages/Analytics';
 import Notifications from './pages/Notifications';
 import CMS from './pages/CMS';
 
-// Component to handle login redirect
-const LoginRoute = () => {
+// Component to handle admin login redirect
+const AdminLoginRoute = () => {
   const { isAuthenticated } = useAuth();
   
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/admin/dashboard" replace />;
   }
   
   return <Login />;
@@ -40,8 +40,8 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public Routes */}
-          <Route path="/home" element={<Home />} />
+          {/* Public Routes - Home and Customer-facing pages */}
+          <Route path="/" element={<Home />} />
           <Route path="/coming-soon" element={<ComingSoon />} />
           <Route path="/category/:serviceName" element={<ServiceDetail />} />
           <Route path="/checkout" element={<Checkout />} />
@@ -49,18 +49,20 @@ function App() {
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/worker-registration" element={<WorkerRegistration />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<LoginRoute />} />
 
-          {/* Protected Routes */}
+          {/* Admin Login Route */}
+          <Route path="/admin/login" element={<AdminLoginRoute />} />
+
+          {/* Protected Admin Routes */}
           <Route
-            path="/"
+            path="/admin"
             element={
               <ProtectedRoute>
                 <MainLayout />
               </ProtectedRoute>
             }
           >
-            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="users" element={<Users />} />
             <Route path="workers" element={<Workers />} />
@@ -76,7 +78,7 @@ function App() {
           </Route>
 
           {/* Catch all - redirect to home */}
-          <Route path="*" element={<Navigate to="/home" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

@@ -324,7 +324,7 @@ const WorkerRegistration = () => {
 
     try {
       console.log('🔄 Saving worker to MongoDB...');
-      console.log('📍 Backend URL: http://localhost:5000/api/auth/worker/register');
+      console.log('📍 Backend URL: https://passo-backend.onrender.com/api/auth/worker/register');
       showToast('Submitting registration to database...', 'info');
 
       // Prepare worker data for backend
@@ -360,7 +360,7 @@ const WorkerRegistration = () => {
 
       // Send to backend API - ONLY MongoDB, no localStorage
       console.log('🌐 Making fetch request...');
-      const response = await fetch('http://localhost:5000/api/auth/worker/register', {
+      const response = await fetch('https://passo-backend.onrender.com/api/auth/worker/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
