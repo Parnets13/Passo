@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MdFilterList, MdVerified, MdStar, MdBlock, MdCheckCircle, MdPerson, MdCancel, MdDescription, MdDelete } from 'react-icons/md';
 import Toast from '../components/Toast';
+import { workerAPI } from '../services/api';
 
 const Workers = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -15,7 +16,6 @@ const Workers = () => {
 
   const loadWorkers = async () => {
     console.log('🔄 Loading workers from MongoDB...');
-    console.log('📍 API URL: https://passo-backend.onrender.com/api/workers');
     console.log('⏰ Timestamp:', new Date().toISOString());
     
     try {
@@ -24,116 +24,83 @@ const Workers = () => {
       if (!token) {
         console.error('❌ No admin token found. Please login first.');
         showToast('Please login to view workers', 'error');
-        setWorkers([]); // Set empty array
+        setWorkers([]);
         return;
       }
 
       console.log('📡 Fetching from MongoDB backend API...');
-      console.log('🔑 Token:', token.substring(0, 20) + '...');
       
-      // Add cache busting and force fresh data
-      const cacheBuster = `?_t=${Date.now()}`;
-      const response = await fetch(`https://passo-backend.onrender.com/api/workers${cacheBuster}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        },
-        cache: 'no-store'
-      });
-
-      console.log('📥 Response status:', response.status);
-      console.log('📥 Response headers:', {
-        'content-type': response.headers.get('content-type'),
-        'cache-control': response.headers.get('cache-control')
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('📥 RAW Response data:', JSON.stringify(data, null, 2));
+      // Use the API service which handles the correct URL from environment variables
+      const data = await workerAPI.getAll();
+      
+      console.log('📥 RAW Response data:', JSON.stringify(data, null, 2));
+      
+      if (data.success && data.data) {
+        console.log('✅ MongoDB returned', data.data.length, 'workers');
         
-        if (data.success && data.data) {
-          console.log('✅ MongoDB returned', data.data.length, 'workers');
-          
-          if (data.data.length === 0) {
-            console.log('⚠️  No workers found in MongoDB');
-            console.log('💡 Register workers at: http://localhost:5173/worker-registration');
-            setWorkers([]);
-            showToast('No workers found. Register workers to see them here.', 'info');
-            return;
-          }
-          
-          // Transform backend data to match UI format
-          const backendWorkers = data.data.map(worker => ({
-            id: worker._id,
-            name: worker.name,
-            type: worker.workerType,
-            category: worker.category,
-            city: worker.city || worker.serviceArea,
-            verified: worker.verified,
-            featured: worker.featured,
-            online: worker.online,
-            status: worker.status,
-            email: worker.email,
-            mobile: worker.mobile,
-            languages: worker.languages || [],
-            profilePhoto: worker.profilePhoto,
-            teamSize: worker.teamSize,
-            badges: worker.badges || [],
-            aadhaarDoc: worker.aadhaarDoc,
-            panCard: worker.panCard,
-            gstCertificate: worker.gstCertificate,
-            gstNumber: worker.gstNumber,
-            msmeCertificate: worker.msmeCertificate,
-            msmeNumber: worker.msmeNumber,
-            submittedAt: worker.submittedAt || worker.createdAt,
-            transactionNumber: worker.onboardingFee?.transactionId
-          }));
-          
-          console.log('✅ Setting', backendWorkers.length, 'workers to state');
-          setWorkers(backendWorkers);
-          
-          // Log statistics
-          const pending = backendWorkers.filter(w => w.status === 'Pending');
-          const approved = backendWorkers.filter(w => w.status === 'Approved');
-          const rejected = backendWorkers.filter(w => w.status === 'Rejected');
-          
-          console.log('📊 Workers Summary:');
-          console.log('   Total:', backendWorkers.length);
-          console.log('   Pending:', pending.length);
-          console.log('   Approved:', approved.length);
-          console.log('   Rejected:', rejected.length);
-          
-          if (pending.length > 0) {
-            console.log('📋 Pending Workers:');
-            pending.forEach(w => console.log(`   - ${w.name} (${w.category}) - ${w.mobile}`));
-          }
-          
-          showToast(`Loaded ${backendWorkers.length} workers from database`, 'success');
-          return;
-        } else {
-          console.error('❌ Invalid response format:', data);
+        if (data.data.length === 0) {
+          console.log('⚠️  No workers found in MongoDB');
+          console.log('💡 Register workers at: /worker-registration');
           setWorkers([]);
-          showToast('Invalid response from server', 'error');
+          showToast('No workers found. Register workers to see them here.', 'info');
+          return;
         }
-      } else if (response.status === 401) {
-        console.error('❌ Unauthorized. Please login again.');
-        setWorkers([]);
-        showToast('Session expired. Please login again.', 'error');
-        return;
+        
+        // Transform backend data to match UI format
+        const backendWorkers = data.data.map(worker => ({
+          id: worker._id,
+          name: worker.name,
+          type: worker.workerType,
+          category: worker.category,
+          city: worker.city || worker.serviceArea,
+          verified: worker.verified,
+          featured: worker.featured,
+          online: worker.online,
+          status: worker.status,
+          email: worker.email,
+          mobile: worker.mobile,
+          languages: worker.languages || [],
+          profilePhoto: worker.profilePhoto,
+          teamSize: worker.teamSize,
+          badges: worker.badges || [],
+          aadhaarDoc: worker.aadhaarDoc,
+          panCard: worker.panCard,
+          gstCertificate: worker.gstCertificate,
+          gstNumber: worker.gstNumber,
+          msmeCertificate: worker.msmeCertificate,
+          msmeNumber: worker.msmeNumber,
+          submittedAt: worker.submittedAt || worker.createdAt,
+          transactionNumber: worker.onboardingFee?.transactionId
+        }));
+        
+        console.log('✅ Setting', backendWorkers.length, 'workers to state');
+        setWorkers(backendWorkers);
+        
+        // Log statistics
+        const pending = backendWorkers.filter(w => w.status === 'Pending');
+        const approved = backendWorkers.filter(w => w.status === 'Approved');
+        const rejected = backendWorkers.filter(w => w.status === 'Rejected');
+        
+        console.log('📊 Workers Summary:');
+        console.log('   Total:', backendWorkers.length);
+        console.log('   Pending:', pending.length);
+        console.log('   Approved:', approved.length);
+        console.log('   Rejected:', rejected.length);
+        
+        if (pending.length > 0) {
+          console.log('📋 Pending Workers:');
+          pending.forEach(w => console.log(`   - ${w.name} (${w.category}) - ${w.mobile}`));
+        }
+        
+        showToast(`Loaded ${backendWorkers.length} workers from database`, 'success');
       } else {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('❌ Backend API returned error:', response.status, errorData);
+        console.error('❌ Invalid response format:', data);
         setWorkers([]);
-        showToast('Failed to load workers from database', 'error');
+        showToast('Invalid response from server', 'error');
       }
     } catch (error) {
       console.error('❌ Failed to load workers from MongoDB:', error);
       console.error('   Error details:', error.message);
-      console.error('   Stack:', error.stack);
       setWorkers([]);
       showToast('Unable to connect to database. Please ensure backend is running.', 'error');
       console.log('⚠️  Make sure:');
@@ -149,35 +116,25 @@ const Workers = () => {
 
   const handleApprove = async (workerId) => {
     try {
-      const token = localStorage.getItem('adminToken');
       console.log('🔄 Approving worker:', workerId);
       
-      const response = await fetch(`https://passo-backend.onrender.com/api/workers/${workerId}/approve`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          console.log('✅ Worker approved in MongoDB');
-          
-          // Update local state with badges
-          const updatedWorkers = workers.map(worker => 
-            worker.id === workerId ? { 
-              ...worker, 
-              status: 'Approved', 
-              verified: true,
-              badges: ['Verified', 'Trusted Pro']
-            } : worker
-          );
-          setWorkers(updatedWorkers);
-          showToast('Worker approved successfully with Verified and Trusted badges', 'success');
-          return;
-        }
+      const data = await workerAPI.approve(workerId);
+      
+      if (data.success) {
+        console.log('✅ Worker approved in MongoDB');
+        
+        // Update local state with badges
+        const updatedWorkers = workers.map(worker => 
+          worker.id === workerId ? { 
+            ...worker, 
+            status: 'Approved', 
+            verified: true,
+            badges: ['Verified', 'Trusted Pro']
+          } : worker
+        );
+        setWorkers(updatedWorkers);
+        showToast('Worker approved successfully with Verified and Trusted badges', 'success');
+        return;
       }
       
       throw new Error('Failed to approve worker');
@@ -192,31 +149,20 @@ const Workers = () => {
     if (reason === null) return; // User cancelled
 
     try {
-      const token = localStorage.getItem('adminToken');
       console.log('🔄 Rejecting worker:', worker.id);
       
-      const response = await fetch(`https://passo-backend.onrender.com/api/workers/${worker.id}/reject`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ reason })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          console.log('✅ Worker rejected in MongoDB');
-          
-          // Update local state
-          const updatedWorkers = workers.map(w => 
-            w.id === worker.id ? { ...w, status: 'Rejected', rejectionReason: reason } : w
-          );
-          setWorkers(updatedWorkers);
-          showToast('Worker rejected', 'warning');
-          return;
-        }
+      const data = await workerAPI.reject(worker.id, reason);
+      
+      if (data.success) {
+        console.log('✅ Worker rejected in MongoDB');
+        
+        // Update local state
+        const updatedWorkers = workers.map(w => 
+          w.id === worker.id ? { ...w, status: 'Rejected', rejectionReason: reason } : w
+        );
+        setWorkers(updatedWorkers);
+        showToast('Worker rejected', 'warning');
+        return;
       }
       
       throw new Error('Failed to reject worker');
@@ -230,30 +176,20 @@ const Workers = () => {
     if (!window.confirm('Are you sure you want to block this worker?')) return;
 
     try {
-      const token = localStorage.getItem('adminToken');
       console.log('🔄 Blocking worker:', workerId);
       
-      const response = await fetch(`https://passo-backend.onrender.com/api/workers/${workerId}/block`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          console.log('✅ Worker blocked in MongoDB');
-          
-          // Update local state
-          const updatedWorkers = workers.map(worker => 
-            worker.id === workerId ? { ...worker, status: 'Blocked', online: false } : worker
-          );
-          setWorkers(updatedWorkers);
-          showToast('Worker blocked successfully', 'success');
-          return;
-        }
+      const data = await workerAPI.block(workerId);
+      
+      if (data.success) {
+        console.log('✅ Worker blocked in MongoDB');
+        
+        // Update local state
+        const updatedWorkers = workers.map(worker => 
+          worker.id === workerId ? { ...worker, status: 'Blocked', online: false } : worker
+        );
+        setWorkers(updatedWorkers);
+        showToast('Worker blocked successfully', 'success');
+        return;
       }
       
       throw new Error('Failed to block worker');
@@ -267,28 +203,18 @@ const Workers = () => {
     if (!window.confirm(`Are you sure you want to permanently delete ${workerName}? This action cannot be undone.`)) return;
 
     try {
-      const token = localStorage.getItem('adminToken');
       console.log('🔄 Deleting worker:', workerId);
       
-      const response = await fetch(`https://passo-backend.onrender.com/api/workers/${workerId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          console.log('✅ Worker deleted from MongoDB');
-          
-          // Remove from local state
-          const updatedWorkers = workers.filter(worker => worker.id !== workerId);
-          setWorkers(updatedWorkers);
-          showToast('Worker deleted successfully', 'success');
-          return;
-        }
+      const data = await workerAPI.delete(workerId);
+      
+      if (data.success) {
+        console.log('✅ Worker deleted from MongoDB');
+        
+        // Remove from local state
+        const updatedWorkers = workers.filter(worker => worker.id !== workerId);
+        setWorkers(updatedWorkers);
+        showToast('Worker deleted successfully', 'success');
+        return;
       }
       
       throw new Error('Failed to delete worker');
@@ -300,24 +226,17 @@ const Workers = () => {
 
   const toggleFeatured = async (workerId) => {
     try {
-      const token = localStorage.getItem('adminToken');
       const worker = workers.find(w => w.id === workerId);
       const newFeatured = !worker.featured;
       
-      const endpoint = newFeatured 
-        ? `https://passo-backend.onrender.com/api/workers/${workerId}/featured`
-        : `https://passo-backend.onrender.com/api/workers/${workerId}/featured`;
-      
-      const response = await fetch(endpoint, {
-        method: newFeatured ? 'POST' : 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: newFeatured ? JSON.stringify({ plan: 'Monthly' }) : undefined
-      });
+      let data;
+      if (newFeatured) {
+        data = await workerAPI.markFeatured(workerId, 'Monthly');
+      } else {
+        data = await workerAPI.removeFeatured(workerId);
+      }
 
-      if (response.ok) {
+      if (data.success) {
         setWorkers(workers.map(w => 
           w.id === workerId ? { ...w, featured: newFeatured } : w
         ));

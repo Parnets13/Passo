@@ -22,6 +22,79 @@
   html {
     font-size: 16px;
   }
+
+  /* Hide main content sections on mobile - only show header, quote, and search */
+  .mobile-hide-content {
+    display: none !important;
+  }
+
+  /* Enhanced mobile background with fixed clean gradient */
+  .mobile-hero-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Subtle overlay for depth */
+  .mobile-hero-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Mobile search box enhancement */
+  .mobile-hero-bg .search-container {
+    position: relative;
+    z-index: 10;
+  }
+
+  .mobile-hero-bg .search-container input {
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2), 0 8px 25px rgba(0, 0, 0, 0.12);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    transition: all 0.3s ease;
+    padding: 1rem 1rem 1rem 3rem;
+    font-size: 0.95rem;
+  }
+
+  .mobile-hero-bg .search-container input:focus {
+    background: rgba(255, 255, 255, 1) !important;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25), 0 12px 35px rgba(0, 0, 0, 0.15);
+    border-color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+  }
+
+  /* Text shadow for better readability on gradient */
+  .mobile-hero-bg h1,
+  .mobile-hero-bg h2,
+  .mobile-hero-bg p {
+    text-shadow: 0 2px 15px rgba(0, 0, 0, 0.2), 0 4px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Smaller header for mobile */
+  header {
+    min-height: 56px;
+  }
+
+  header img {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  /* Better spacing for mobile hero section */
+  .mobile-hero-bg > div {
+    width: 100%;
+  }
 }
 
 /* Extra small devices */
@@ -180,6 +253,67 @@
   }
   100% {
     background-position: 0% 50%;
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes float-particles {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-30px) scale(1.1);
+  }
+}
+
+/* Subtle professional animations for mobile */
+@keyframes float-subtle {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-20px) translateX(15px);
+    opacity: 0.8;
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2);
+  }
+}
+
+.animate-float-subtle {
+  animation: float-subtle 15s ease-in-out infinite;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+@keyframes pattern-move {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 50px 50px;
   }
 }
 

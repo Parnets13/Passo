@@ -76,7 +76,7 @@ const Home = () => {
       heroSubtitle: 'local Service Expert',
       heroDescription: 'Connect with verified professionals in',
       searchPlaceholder: 'Search for services...',
-      trustedBy: 'Trusted by 50,000+ Customers',
+      // trustedBy: 'Trusted by 50,000+ Customers',
       verifiedWorkers: 'Verified Workers',
       jobsCompleted: 'Jobs Completed',
       avgRating: 'Average Rating',
@@ -522,17 +522,17 @@ const Home = () => {
               <img 
                 src="/logo.jpeg" 
                 alt="Passo" 
-                className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain rounded-lg"
+                className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain rounded-lg"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%2326296c" width="100" height="100"/%3E%3Ctext x="50" y="50" font-size="40" fill="white" text-anchor="middle" dominant-baseline="middle"%3EP%3C/text%3E%3C/svg%3E';
                 }}
               />
               <div className="flex flex-col">
-                <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#26296c]">
+                <span className="text-base sm:text-2xl md:text-3xl font-bold text-[#26296c]">
                   Passo
                 </span>
-                <span className="text-[9px] sm:text-[10px] md:text-xs text-gray-600 font-medium -mt-0.5 sm:-mt-1 hidden xs:block">
+                <span className="text-[8px] sm:text-[10px] md:text-xs text-gray-600 font-medium -mt-0.5 sm:-mt-1 hidden xs:block">
                   Your Service Partner
                 </span>
               </div>
@@ -585,9 +585,26 @@ const Home = () => {
       </header>
 
       {/* Hero Section - Premium & Clean with Animations */}
-      <section className="relative w-full px-4 sm:px-8 lg:px-12 xl:px-16 py-8 sm:py-12 overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <section className="relative w-full px-4 sm:px-8 lg:px-12 xl:px-16 py-4 sm:py-12 overflow-hidden mobile-hero-bg">
+        {/* Mobile-Only Floating Decorative Elements - Subtle Professional */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none sm:hidden">
+          {/* Subtle floating circles */}
+          <div className="absolute top-16 left-8 w-28 h-28 bg-white/8 rounded-full blur-2xl animate-float-subtle" style={{ animationDuration: '15s' }}></div>
+          <div className="absolute bottom-24 right-8 w-36 h-36 bg-white/10 rounded-full blur-3xl animate-float-subtle" style={{ animationDuration: '18s', animationDelay: '2s' }}></div>
+          <div className="absolute top-1/3 right-12 w-24 h-24 bg-white/6 rounded-full blur-2xl animate-float-subtle" style={{ animationDelay: '4s', animationDuration: '16s' }}></div>
+          
+          {/* Minimal geometric shapes */}
+          <div className="absolute top-1/4 left-1/4 w-14 h-14 border border-white/10 rounded-lg animate-float-subtle" style={{ animationDuration: '20s' }}></div>
+          <div className="absolute bottom-1/3 right-1/4 w-10 h-10 border border-white/8 rounded-full animate-float-subtle" style={{ animationDelay: '3s', animationDuration: '17s' }}></div>
+          
+          {/* Tiny sparkles */}
+          <div className="absolute top-20 left-12 w-2 h-2 bg-white/40 rounded-full animate-pulse-subtle"></div>
+          <div className="absolute top-48 right-20 w-2 h-2 bg-white/35 rounded-full animate-pulse-subtle" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute bottom-36 left-16 w-2 h-2 bg-white/40 rounded-full animate-pulse-subtle" style={{ animationDelay: '2s' }}></div>
+        </div>
+
+        {/* Animated Background Elements - Desktop Only */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block">
           {/* Large Gradient Orbs */}
           <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-[#26296c]/10 to-blue-400/10 rounded-full blur-3xl animate-blob"></div>
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
@@ -616,70 +633,32 @@ const Home = () => {
           <div className="absolute inset-0 bg-gradient-radial from-transparent to-white/80"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-8 sm:mb-12">
-            {/* Animated Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-[#26296c]/20 rounded-full mb-6 shadow-lg opacity-0 animate-fade-in-down" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
-              <div className="flex items-center gap-1">
-                <MdStar className="text-yellow-500" size={16} />
-                <MdStar className="text-yellow-500" size={16} />
-                <MdStar className="text-yellow-500" size={16} />
-              </div>
-              <span className="text-sm font-semibold text-gray-700">{t.trustedBy}</span>
+        <div className="max-w-7xl mx-auto relative z-10 flex flex-col justify-center min-h-[calc(100vh-56px)] sm:min-h-0">
+          <div className="text-center">
+            {/* Hero Title & Subtitle - At the Very Top with more spacing */}
+            <div className="mb-8 sm:mb-6 opacity-0 animate-fade-in-up pt-8 sm:pt-0" style={{ animationDelay: '0s', animationFillMode: 'forwards' }}>
+              <h1 className="text-2xl sm:text-5xl md:text-6xl font-bold text-white sm:text-gray-900 mb-2 sm:mb-3 leading-tight drop-shadow-md sm:drop-shadow-none">
+                {t.heroTitle}
+              </h1>
+              <h2 className="text-xl sm:text-4xl md:text-5xl font-bold text-white sm:text-gray-900 mb-3 sm:mb-4 leading-tight drop-shadow-md sm:drop-shadow-none">
+                {t.heroSubtitle}
+              </h2>
+              <p className="text-sm sm:text-xl text-white/90 sm:text-gray-600 font-medium drop-shadow-sm sm:drop-shadow-none px-4">
+                {t.heroDescription} <span className="font-bold text-white sm:text-[#26296c]">{selectedLocation}</span>
+              </p>
             </div>
 
-            {/* Main Heading with Gradient Animation */}
-            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight opacity-0 animate-fade-in-up" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
-              {t.heroTitle}
-              <span className="block bg-gradient-to-r from-[#26296c] via-blue-600 to-[#26296c] bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
-                 {t.heroSubtitle}
-              </span>
-            </h1>
-
-            {/* Subtitle with Animation */}
-            <p className="text-sm sm:text-lg text-gray-600 mb-4 sm:mb-6 px-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}>
-              {t.heroDescription} <span className="font-semibold text-[#26296c]">{selectedLocation}</span>
-            </p>
-
-            {/* Trust Indicators */}
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-5 mb-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}>
-              <div className="flex items-center gap-2 text-sm text-gray-600 hover:scale-105 transition-transform">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                  <MdCheckCircle className="text-green-600" size={18} />
-                </div>
-                <span className="font-medium">{t.connectDirectly}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600 hover:scale-105 transition-transform">
-                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                  <MdCheckCircle className="text-blue-600" size={18} />
-                </div>
-                <span className="font-medium">{t.noBookingFees}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600 hover:scale-105 transition-transform">
-                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
-                  <MdCheckCircle className="text-purple-600" size={18} />
-                </div>
-                <span className="font-medium">{t.nearbyServices}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600 hover:scale-105 transition-transform">
-                <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
-                  <MdCheckCircle className="text-orange-600" size={18} />
-                </div>
-                <span className="font-medium">{t.quickHelp}</span>
-              </div>
-            </div>
-
-            {/* Premium Search Bar with Dropdown */}
-            <div className="max-w-3xl mx-auto px-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '1s', animationFillMode: 'forwards' }}>
+            {/* Premium Search Bar with Dropdown - Perfectly Centered */}
+            <div className="max-w-3xl mx-auto px-4 mb-8 sm:mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
               <div className="relative search-container group">
-                <MdSearch className="absolute left-4 sm:left-6 top-1/2 transform -translate-y-1/2 text-gray-500 z-10 group-focus-within:text-[#26296c] transition-colors pointer-events-none" size={24} />
+                <MdSearch className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-500 z-10 group-focus-within:text-[#26296c] transition-colors pointer-events-none" size={24} />
                 <input
                   type="text"
                   placeholder={t.searchPlaceholder}
                   value={searchQuery}
                   onChange={handleSearchChange}
                   onFocus={() => setShowServiceDropdown(true)}
-                  className="w-full pl-14 sm:pl-20 pr-20 sm:pr-24 py-4 sm:py-5 text-base sm:text-lg font-semibold text-gray-900 bg-white border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-[#26296c] focus:ring-4 focus:ring-[#26296c]/10 transition-all shadow-lg hover:shadow-xl placeholder:text-gray-400 placeholder:font-normal"
+                  className="w-full pl-14 sm:pl-16 pr-14 sm:pr-24 py-4 sm:py-5 text-base sm:text-lg font-medium text-gray-900 bg-white border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-[#26296c] focus:ring-4 focus:ring-[#26296c]/10 transition-all shadow-lg hover:shadow-xl placeholder:text-gray-400 placeholder:font-normal text-left"
                   style={{ backgroundColor: '#ffffff' }}
                 />
                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2 hidden sm:flex items-center gap-2 text-xs text-gray-400 pointer-events-none z-10">
@@ -733,32 +712,58 @@ const Home = () => {
                 )}
               </div>
             </div>
+
+            {/* Trusted Badge - Hidden on Mobile */}
+            <div className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full mb-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}>
+              <MdCheckCircle className="text-blue-600" size={20} />
+              <span className="text-sm font-semibold text-gray-700">{t.trustedBy}</span>
+            </div>
+
+            {/* Trust Indicators - Hidden on Mobile */}
+            <div className="hidden sm:flex items-center justify-center gap-6 mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.7s', animationFillMode: 'forwards' }}>
+              <div className="flex items-center gap-2 text-gray-700">
+                <MdCheckCircle className="text-green-500" size={18} />
+                <span className="text-sm font-medium">{t.connectDirectly}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-700">
+                <MdCheckCircle className="text-green-500" size={18} />
+                <span className="text-sm font-medium">{t.noBookingFees}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-700">
+                <MdCheckCircle className="text-green-500" size={18} />
+                <span className="text-sm font-medium">{t.nearbyServices}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-700">
+                <MdCheckCircle className="text-green-500" size={18} />
+                <span className="text-sm font-medium">{t.quickHelp}</span>
+              </div>
+            </div>
           </div>
 
           {/* Animated Stats with Premium Design */}
-          <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-4xl mx-auto mb-8 sm:mb-12 px-4">
+          <div className="grid grid-cols-3 gap-3 sm:gap-8 max-w-4xl mx-auto mb-0 sm:mb-12 px-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}>
             <div className="text-center group hover:scale-105 transition-transform opacity-0 animate-fade-in-up" style={{ animationDelay: '1.2s', animationFillMode: 'forwards' }}>
-              <div className="relative inline-block mb-2">
+              <div className="relative inline-block mb-1">
                 <div className="absolute inset-0 bg-[#26296c]/10 rounded-2xl blur-xl group-hover:bg-[#26296c]/20 transition-all"></div>
-                <div className="relative text-2xl sm:text-4xl font-bold text-[#26296c] mb-1 sm:mb-2">10K+</div>
+                <div className="relative text-xl sm:text-4xl font-bold text-white sm:text-[#26296c] mb-1">10K+</div>
               </div>
-              <div className="text-xs sm:text-sm text-gray-600 font-medium">{t.verifiedWorkers}</div>
+              <div className="text-[10px] sm:text-sm text-white/80 sm:text-gray-600 font-medium">{t.verifiedWorkers}</div>
             </div>
             <div className="text-center group hover:scale-105 transition-transform opacity-0 animate-fade-in-up" style={{ animationDelay: '1.4s', animationFillMode: 'forwards' }}>
-              <div className="relative inline-block mb-2">
+              <div className="relative inline-block mb-1">
                 <div className="absolute inset-0 bg-[#26296c]/10 rounded-2xl blur-xl group-hover:bg-[#26296c]/20 transition-all"></div>
-                <div className="relative text-2xl sm:text-4xl font-bold text-[#26296c] mb-1 sm:mb-2">50K+</div>
+                <div className="relative text-xl sm:text-4xl font-bold text-white sm:text-[#26296c] mb-1">50K+</div>
               </div>
-              <div className="text-xs sm:text-sm text-gray-600 font-medium">{t.jobsCompleted}</div>
+              <div className="text-[10px] sm:text-sm text-white/80 sm:text-gray-600 font-medium">{t.jobsCompleted}</div>
             </div>
             <div className="text-center group hover:scale-105 transition-transform opacity-0 animate-fade-in-up" style={{ animationDelay: '1.6s', animationFillMode: 'forwards' }}>
-              <div className="relative inline-block mb-2">
+              <div className="relative inline-block mb-1">
                 <div className="absolute inset-0 bg-yellow-500/10 rounded-2xl blur-xl group-hover:bg-yellow-500/20 transition-all"></div>
-                <div className="relative text-2xl sm:text-4xl font-bold text-[#26296c] mb-1 sm:mb-2 flex items-center justify-center gap-1">
-                  4.8 <MdStar size={20} className="text-yellow-500 sm:w-8 sm:h-8 animate-pulse" />
+                <div className="relative text-xl sm:text-4xl font-bold text-white sm:text-[#26296c] mb-1 flex items-center justify-center gap-1">
+                  4.8 <MdStar size={16} className="text-yellow-400 sm:text-yellow-500 sm:w-8 sm:h-8 animate-pulse" />
                 </div>
               </div>
-              <div className="text-xs sm:text-sm text-gray-600 font-medium">{t.avgRating}</div>
+              <div className="text-[10px] sm:text-sm text-white/80 sm:text-gray-600 font-medium">{t.avgRating}</div>
             </div>
           </div>
         </div>

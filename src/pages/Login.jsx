@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MdPhone, MdLock, MdVisibility, MdVisibilityOff, MdLogin } from 'react-icons/md';
+import { MdPhone, MdLock, MdVisibility, MdVisibilityOff, MdLogin, MdEmail, MdClose } from 'react-icons/md';
 import { useAuth } from '../context/AuthContext';
 import Toast from '../components/Toast';
+import api from '../services/api';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -10,6 +11,12 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [toast, setToast] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetToken, setResetToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [resetStep, setResetStep] = useState(1); // 1: email, 2: token & password
+  const [isResetting, setIsResetting] = useState(false);
   
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -36,7 +43,7 @@ const Login = () => {
       if (result.success) {
         setToast({ message: 'Login successful! Redirecting...', type: 'success' });
         setTimeout(() => {
-          navigate('/dashboard');
+          navigate('/admin/dashboard');
         }, 1000);
       } else {
         setToast({ message: result.error || 'Invalid credentials', type: 'error' });
@@ -46,6 +53,86 @@ const Login = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    
+    if (!resetEmail) {
+      setToast({ message: 'Please enter your email address', type: 'error' });
+      return;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(resetEmail)) {
+      setToast({ message: 'Please enter a valid email address', type: 'error' });
+      return;
+    }
+
+    setIsResetting(true);
+    
+    try {
+      const response = await api.post('/auth/forgot-password', { email: resetEmail });
+      
+      if (response.data.success) {
+        setToast({ message: 'Reset code sent to your email!', type: 'success' });
+        setResetStep(2);
+      }
+    } catch (error) {
+      setToast({ 
+        message: error.response?.data?.message || 'Failed to send reset code', 
+        type: 'error' 
+      });
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    
+    if (!resetToken || !newPassword) {
+      setToast({ message: 'Please fill in all fields', type: 'error' });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setToast({ message: 'Password must be at least 6 characters', type: 'error' });
+      return;
+    }
+
+    setIsResetting(true);
+    
+    try {
+      const response = await api.post('/auth/reset-password', {
+        email: resetEmail,
+        resetToken,
+        newPassword
+      });
+      
+      if (response.data.success) {
+        setToast({ message: 'Password reset successful! You can now login.', type: 'success' });
+        setShowForgotPassword(false);
+        setResetStep(1);
+        setResetEmail('');
+        setResetToken('');
+        setNewPassword('');
+      }
+    } catch (error) {
+      setToast({ 
+        message: error.response?.data?.message || 'Failed to reset password', 
+        type: 'error' 
+      });
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
+  const closeForgotPasswordModal = () => {
+    setShowForgotPassword(false);
+    setResetStep(1);
+    setResetEmail('');
+    setResetToken('');
+    setNewPassword('');
   };
 
   return (
@@ -66,7 +153,7 @@ const Login = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-white rounded-2xl blur-md opacity-50"></div>
                 <img 
-                  src="/src/assets/logo.jpeg" 
+                  src="/logo.jpeg" 
                   alt="Logo" 
                   className="relative w-24 h-24 rounded-2xl shadow-2xl object-cover border-4 border-white"
                 />
@@ -135,9 +222,13 @@ const Login = () => {
                   />
                   <span className="ml-2 text-sm text-gray-600 group-hover:text-gray-800 transition-colors">Remember me</span>
                 </label>
-                <a href="#" className="text-sm text-blue-600 hover:text-blue-700 font-semibold transition-colors">
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+                >
                   Forgot password?
-                </a>
+                </button>
               </div>
 
               {/* Submit Button */}
@@ -197,6 +288,126 @@ const Login = () => {
           type={toast.type}
           onClose={() => setToast(null)}
         />
+      )}
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative">
+            {/* Close Button */}
+            <button
+              onClick={closeForgotPasswordModal}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <MdClose size={24} />
+            </button>
+
+            {/* Step 1: Enter Email */}
+            {resetStep === 1 && (
+              <>
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">Forgot Password?</h2>
+                <p className="text-gray-600 mb-6">Enter your email address and we'll send you a reset code.</p>
+                
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Email Address
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <MdEmail className="text-gray-400" size={20} />
+                      </div>
+                      <input
+                        type="email"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                        placeholder="Enter your email"
+                        disabled={isResetting}
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isResetting}
+                    className={`w-full py-3 px-4 rounded-xl font-semibold text-white transition-all ${
+                      isResetting
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'
+                    }`}
+                  >
+                    {isResetting ? 'Sending...' : 'Send Reset Code'}
+                  </button>
+                </form>
+              </>
+            )}
+
+            {/* Step 2: Enter Reset Code & New Password */}
+            {resetStep === 2 && (
+              <>
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">Reset Password</h2>
+                <p className="text-gray-600 mb-6">Enter the code sent to your email and your new password.</p>
+                
+                <form onSubmit={handleResetPassword} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Reset Code
+                    </label>
+                    <input
+                      type="text"
+                      value={resetToken}
+                      onChange={(e) => setResetToken(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                      placeholder="Enter 6-digit code"
+                      maxLength={6}
+                      disabled={isResetting}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      New Password
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <MdLock className="text-gray-400" size={20} />
+                      </div>
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                        placeholder="Enter new password"
+                        disabled={isResetting}
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isResetting}
+                    className={`w-full py-3 px-4 rounded-xl font-semibold text-white transition-all ${
+                      isResetting
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'
+                    }`}
+                  >
+                    {isResetting ? 'Resetting...' : 'Reset Password'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setResetStep(1)}
+                    className="w-full text-sm text-blue-600 hover:text-blue-700 font-semibold"
+                  >
+                    Back to email
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
